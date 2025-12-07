@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useMemo } from "react"
 
 export interface Task {
@@ -73,6 +75,8 @@ export function useTasks() {
     const [filter, setFilter] = useState("all")
     const [sort, setSort] = useState("due-asc")
 
+    const [categories, setCategories] = useState<string[]>(Array.from(new Set(SAMPLE_TASKS.map(t => t.category))))
+
     const filteredAndSortedTasks = useMemo(() => {
         let result = [...tasks]
 
@@ -125,16 +129,30 @@ export function useTasks() {
         return result
     }, [tasks, filter, sort])
 
-    const addTask = () => {
-        alert("Add new task dialog would open here")
+    const addTask = (newTask: Omit<Task, "id">) => {
+        const task: Task = {
+            ...newTask,
+            id: Math.random().toString(36).substr(2, 9),
+        }
+        setTasks([...tasks, task])
     }
 
     const updateTask = (task: Task) => {
-        alert(`Edit task: ${task.title}`)
+        setTasks(tasks.map((t) => (t.id === task.id ? task : t)))
     }
 
     const deleteTask = (taskId: string) => {
         setTasks(tasks.filter((t) => t.id !== taskId))
+    }
+
+    const addCategory = (category: string) => {
+        if (!categories.includes(category)) {
+            setCategories([...categories, category])
+        }
+    }
+
+    const deleteCategory = (category: string) => {
+        setCategories(categories.filter((c) => c !== category))
     }
 
     return {
@@ -146,5 +164,8 @@ export function useTasks() {
         addTask,
         updateTask,
         deleteTask,
+        categories,
+        addCategory,
+        deleteCategory,
     }
 }
