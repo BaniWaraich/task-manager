@@ -1,65 +1,163 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState, useMemo } from "react"
+import { TaskFilters } from "@/components/task-filters"
+import { TaskTable } from "@/components/task-table"
+
+interface Task {
+  id: string
+  title: string
+  description: string
+  deadline: Date
+  category: string
+  priority: "low" | "medium" | "high"
+  status: "todo" | "in-progress" | "completed"
+}
+
+// Sample task data
+const SAMPLE_TASKS: Task[] = [
+  {
+    id: "1",
+    title: "Design new dashboard layout",
+    description: "Create wireframes and high-fidelity mockups for the updated dashboard interface",
+    deadline: new Date(2025, 11, 10),
+    category: "Design",
+    priority: "high",
+    status: "in-progress",
+  },
+  {
+    id: "2",
+    title: "Review pull requests",
+    description: "Review and merge pending PRs from the team",
+    deadline: new Date(2025, 11, 8),
+    category: "Development",
+    priority: "high",
+    status: "todo",
+  },
+  {
+    id: "3",
+    title: "Update documentation",
+    description: "Update API documentation with new endpoints and examples",
+    deadline: new Date(2025, 11, 15),
+    category: "Documentation",
+    priority: "medium",
+    status: "todo",
+  },
+  {
+    id: "4",
+    title: "Fix critical bug in auth",
+    description: "Resolve the authentication issue affecting user login flow",
+    deadline: new Date(2025, 12, 5),
+    category: "Development",
+    priority: "high",
+    status: "todo",
+  },
+  {
+    id: "5",
+    title: "Client feedback review",
+    description: "Compile and prioritize feedback from recent client meeting",
+    deadline: new Date(2025, 11, 9),
+    category: "Communication",
+    priority: "medium",
+    status: "completed",
+  },
+  {
+    id: "6",
+    title: "Optimize database queries",
+    description: "Identify and optimize slow-running database queries in production",
+    deadline: new Date(2025, 12, 12),
+    category: "Development",
+    priority: "low",
+    status: "todo",
+  },
+]
+
+export default function Dashboard() {
+  const [filter, setFilter] = useState("all")
+  const [sort, setSort] = useState("due-asc")
+
+  const filteredAndSortedTasks = useMemo(() => {
+    let result = [...SAMPLE_TASKS]
+
+    // Apply filter
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    switch (filter) {
+      case "today":
+        result = result.filter((task) => {
+          const taskDate = new Date(task.deadline)
+          taskDate.setHours(0, 0, 0, 0)
+          return taskDate.getTime() === today.getTime()
+        })
+        break
+      case "upcoming":
+        result = result.filter((task) => task.deadline > today && task.status !== "completed")
+        break
+      case "completed":
+        result = result.filter((task) => task.status === "completed")
+        break
+      case "priority-high":
+        result = result.filter((task) => task.priority === "high")
+        break
+      case "priority-medium":
+        result = result.filter((task) => task.priority === "medium")
+        break
+      case "priority-low":
+        result = result.filter((task) => task.priority === "low")
+        break
+    }
+
+    // Apply sort
+    switch (sort) {
+      case "due-asc":
+        result.sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
+        break
+      case "due-desc":
+        result.sort((a, b) => b.deadline.getTime() - a.deadline.getTime())
+        break
+      case "priority":
+        const priorityOrder = { high: 0, medium: 1, low: 2 }
+        result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+        break
+      case "title":
+        result.sort((a, b) => a.title.localeCompare(b.title))
+        break
+    }
+
+    return result
+  }, [filter, sort])
+
+  const handleAddTask = () => {
+    alert("Add new task dialog would open here")
+  }
+
+  const handleEditTask = (task: Task) => {
+    alert(`Edit task: ${task.title}`)
+  }
+
+  const handleDeleteTask = (taskId: string) => {
+    alert(`Delete task: ${taskId}`)
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Tasks</h2>
+        <p className="text-muted-foreground mt-2">Manage and organize your tasks</p>
+      </div>
+
+      <TaskFilters
+        onAddTask={handleAddTask}
+        onFilterChange={setFilter}
+        onSortChange={setSort}
+        currentFilter={filter}
+        currentSort={sort}
+      />
+
+      <TaskTable tasks={filteredAndSortedTasks} onEdit={handleEditTask} onDelete={handleDeleteTask} />
     </div>
-  );
+  )
 }
