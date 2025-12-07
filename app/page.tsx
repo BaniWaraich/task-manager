@@ -5,6 +5,7 @@ import { TaskFilters } from "@/components/task-filters"
 import { TaskTable } from "@/components/task-table"
 import { useTasks } from "@/hooks/use-tasks"
 import { AddTaskDialog } from "@/components/add-task-dialog"
+import { Toaster } from "@/components/ui/sonner"
 
 export default function Dashboard() {
   const {
@@ -18,7 +19,8 @@ export default function Dashboard() {
     deleteTask,
     categories,
     addCategory,
-    deleteCategory
+    deleteCategory,
+    restoreCategory
   } = useTasks()
 
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
@@ -51,7 +53,10 @@ export default function Dashboard() {
         categories={categories}
         onAddCategory={addCategory}
         onDeleteCategory={deleteCategory}
+        onRestoreCategory={restoreCategory}
+        tasks={tasks}
       />
+      <Toaster />
     </div>
   )
 }

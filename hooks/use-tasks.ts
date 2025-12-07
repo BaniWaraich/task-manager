@@ -152,7 +152,25 @@ export function useTasks() {
     }
 
     const deleteCategory = (category: string) => {
+        const tasksToDelete = tasks.filter(t => t.category === category)
+
+        // Remove category
         setCategories(categories.filter((c) => c !== category))
+
+        // Remove associated tasks
+        setTasks(tasks.filter((t) => t.category !== category))
+
+        return {
+            category,
+            tasks: tasksToDelete
+        }
+    }
+
+    const restoreCategory = (category: string, restoredTasks: Task[]) => {
+        if (!categories.includes(category)) {
+            setCategories(prev => [...prev, category])
+        }
+        setTasks(prev => [...prev, ...restoredTasks])
     }
 
     return {
@@ -167,5 +185,6 @@ export function useTasks() {
         categories,
         addCategory,
         deleteCategory,
+        restoreCategory
     }
 }
