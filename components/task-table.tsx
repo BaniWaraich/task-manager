@@ -7,6 +7,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface Task {
     id: string
@@ -25,6 +35,7 @@ interface TaskTableProps {
 }
 
 export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
+    const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
     const [pageSize, setPageSize] = useState(10)
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -65,6 +76,13 @@ export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
             day: "numeric",
             year: "numeric",
         })
+    }
+
+    const handleDelete = () => {
+        if (taskToDelete) {
+            onDelete(taskToDelete)
+            setTaskToDelete(null)
+        }
     }
 
     if (tasks.length === 0) {
@@ -128,7 +146,7 @@ export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => onDelete(task.id)}
+                                            onClick={() => setTaskToDelete(task.id)}
                                             className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -193,7 +211,7 @@ export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => onDelete(task.id)}
+                                    onClick={() => setTaskToDelete(task.id)}
                                     className="h-7 w-7 p-0 text-destructive hover:text-destructive"
                                 >
                                     <Trash2 className="h-3 w-3" />
@@ -267,6 +285,23 @@ export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
                     </Button>
                 </div>
             </div>
+
+            <AlertDialog open={!!taskToDelete} onOpenChange={(open) => !open && setTaskToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the task.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
