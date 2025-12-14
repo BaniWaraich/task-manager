@@ -144,25 +144,32 @@ export function useTasks() {
     }
 
     const deleteCategory = (category: string) => {
-        const tasksToDelete = tasks.filter(t => t.category === category)
+        const tasksToUpdate = tasks.filter(t => t.category === category)
+        const taskIds = tasksToUpdate.map(t => t.id)
 
         // Remove category
         setCategories(categories.filter((c) => c !== category))
 
-        // Remove associated tasks
-        setTasks(tasks.filter((t) => t.category !== category))
+        // Update associated tasks to have no category
+        setTasks(tasks.map((t) =>
+            t.category === category ? { ...t, category: "" } : t
+        ))
 
         return {
             category,
-            tasks: tasksToDelete
+            taskIds
         }
     }
 
-    const restoreCategory = (category: string, restoredTasks: Task[]) => {
+    const restoreCategory = (category: string, taskIds: string[]) => {
         if (!categories.includes(category)) {
             setCategories(prev => [...prev, category])
         }
-        setTasks(prev => [...prev, ...restoredTasks])
+
+        // Restore category to the tasks
+        setTasks(prev => prev.map(t =>
+            taskIds.includes(t.id) ? { ...t, category } : t
+        ))
     }
 
     return {

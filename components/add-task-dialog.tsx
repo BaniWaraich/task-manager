@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { format } from "date-fns"
@@ -20,8 +20,8 @@ interface AddTaskDialogProps {
     onAddTask: (task: any) => void
     categories: string[]
     onAddCategory: (category: string) => void
-    onDeleteCategory: (category: string) => { category: string; tasks: Task[] } | void
-    onRestoreCategory?: (category: string, tasks: Task[]) => void
+    onDeleteCategory: (category: string) => { category: string; taskIds: string[] } | void
+    onRestoreCategory?: (category: string, taskIds: string[]) => void
     tasks?: Task[]
 }
 
@@ -106,15 +106,15 @@ export function AddTaskDialog({
         if (category === categoryToDelete) setCategory("")
 
         // Show Undo Toast
-        if (result && typeof result === 'object' && 'tasks' in result) { // Safety check
-            const { category: deletedCat, tasks: deletedTasks } = result
+        if (result && typeof result === 'object' && 'taskIds' in result) { // Safety check
+            const { category: deletedCat, taskIds } = result
             toast(`Category "${deletedCat}" deleted`, {
-                description: `${deletedTasks.length} tasks removed`,
+                description: "Tasks kept as Uncategorized",
                 action: {
                     label: "Undo",
                     onClick: () => {
                         if (onRestoreCategory) {
-                            onRestoreCategory(deletedCat, deletedTasks)
+                            onRestoreCategory(deletedCat, taskIds)
                             toast.success("Restore successful")
                         }
                     },
@@ -170,7 +170,7 @@ export function AddTaskDialog({
                         <div className="space-y-2">
                             <Label htmlFor="category">Category</Label>
                             <Popover open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
-                                <PopoverTrigger asChild>
+                                <PopoverAnchor asChild>
                                     <div className="relative">
                                         <Input
                                             id="category"
@@ -182,12 +182,13 @@ export function AddTaskDialog({
                                             }}
                                             onKeyDown={handleCategoryKeyDown}
                                             onFocus={() => setIsCategoryOpen(true)}
+                                            onClick={() => setIsCategoryOpen(true)}
                                             placeholder="Type or select a category"
                                             autoComplete="off"
                                             required
                                         />
                                     </div>
-                                </PopoverTrigger>
+                                </PopoverAnchor>
                                 <PopoverContent
                                     className="w-[var(--radix-popover-trigger-width)] p-1"
                                     align="start"
@@ -271,7 +272,7 @@ export function AddTaskDialog({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Category?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will remove the category "{categoryToDelete}" and {categoryToDelete ? getTaskCount(categoryToDelete) : 0} associated tasks.
+                            This will remove the category "{categoryToDelete}".
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -281,7 +282,7 @@ export function AddTaskDialog({
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog >
         </>
     )
 }
