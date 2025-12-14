@@ -10,8 +10,8 @@ import { Toaster } from "@/components/ui/sonner"
 export default function Dashboard() {
   const {
     tasks,
-    filter,
-    setFilter,
+    filters,
+    setFilters,
     sort,
     setSort,
     addTask,
@@ -38,10 +38,11 @@ export default function Dashboard() {
 
       <TaskFilters
         onAddTask={handleAddTaskClick}
-        onFilterChange={setFilter}
+        filters={filters}
+        setFilters={setFilters}
         onSortChange={setSort}
-        currentFilter={filter}
         currentSort={sort}
+        categories={categories}
       />
 
       <TaskTable tasks={tasks} onEdit={updateTask} onDelete={deleteTask} />

@@ -72,62 +72,54 @@ const SAMPLE_TASKS: Task[] = [
 
 export function useTasks() {
     const [tasks, setTasks] = useState<Task[]>(SAMPLE_TASKS)
-    const [filter, setFilter] = useState("all")
-    const [sort, setSort] = useState("due-asc")
+    const [filters, setFilters] = useState({
+        categories: [] as string[],
+        priorities: [] as string[],
+        statuses: [] as string[]
+    })
+    const [sort, setSort] = useState("deadline-asc")
 
     const [categories, setCategories] = useState<string[]>(Array.from(new Set(SAMPLE_TASKS.map(t => t.category))))
 
     const filteredAndSortedTasks = useMemo(() => {
         let result = [...tasks]
 
-        // Apply filter
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        // Apply filters
+        // Category (OR)
+        if (filters.categories.length > 0) {
+            result = result.filter(task => filters.categories.includes(task.category))
+        }
 
-        switch (filter) {
-            case "today":
-                result = result.filter((task) => {
-                    const taskDate = new Date(task.deadline)
-                    taskDate.setHours(0, 0, 0, 0)
-                    return taskDate.getTime() === today.getTime()
-                })
-                break
-            case "upcoming":
-                result = result.filter((task) => task.deadline > today && task.status !== "completed")
-                break
-            case "completed":
-                result = result.filter((task) => task.status === "completed")
-                break
-            case "priority-high":
-                result = result.filter((task) => task.priority === "high")
-                break
-            case "priority-medium":
-                result = result.filter((task) => task.priority === "medium")
-                break
-            case "priority-low":
-                result = result.filter((task) => task.priority === "low")
-                break
+        // Priority (OR)
+        if (filters.priorities.length > 0) {
+            result = result.filter(task => filters.priorities.includes(task.priority))
+        }
+
+        // Status (OR)
+        if (filters.statuses.length > 0) {
+            result = result.filter(task => filters.statuses.includes(task.status))
         }
 
         // Apply sort
         switch (sort) {
-            case "due-asc":
+            case "deadline-asc":
                 result.sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
                 break
-            case "due-desc":
+            case "deadline-desc":
                 result.sort((a, b) => b.deadline.getTime() - a.deadline.getTime())
                 break
-            case "priority":
-                const priorityOrder = { high: 0, medium: 1, low: 2 }
-                result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+            case "priority-asc": // Low to High
+                const priorityOrderAsc = { low: 0, medium: 1, high: 2 }
+                result.sort((a, b) => priorityOrderAsc[a.priority] - priorityOrderAsc[b.priority])
                 break
-            case "title":
-                result.sort((a, b) => a.title.localeCompare(b.title))
+            case "priority-desc": // High to Low
+                const priorityOrderDesc = { high: 0, medium: 1, low: 2 }
+                result.sort((a, b) => priorityOrderDesc[a.priority] - priorityOrderDesc[b.priority])
                 break
         }
 
         return result
-    }, [tasks, filter, sort])
+    }, [tasks, filters, sort])
 
     const addTask = (newTask: Omit<Task, "id">) => {
         const task: Task = {
@@ -175,8 +167,8 @@ export function useTasks() {
 
     return {
         tasks: filteredAndSortedTasks,
-        filter,
-        setFilter,
+        filters,
+        setFilters,
         sort,
         setSort,
         addTask,
