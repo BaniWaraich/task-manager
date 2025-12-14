@@ -18,15 +18,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-interface Task {
-    id: string
-    title: string
-    description: string
-    deadline: Date
-    category: string
-    priority: "low" | "medium" | "high"
-    status: "todo" | "in-progress" | "completed"
-}
+import { Task } from "@/hooks/use-tasks"
 
 interface TaskTableProps {
     tasks: Task[]
@@ -70,8 +62,8 @@ export function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
         }
     }
 
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString("en-US", {
+    const formatDate = (date: Date | string) => {
+        return new Date(date).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
             year: "numeric",

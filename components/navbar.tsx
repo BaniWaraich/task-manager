@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+import { useAuth } from "@/hooks/use-auth"
+import Link from "next/link"
+
 interface NavbarProps {
     sidebarOpen: boolean
     onSidebarToggle: () => void
@@ -19,6 +22,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ sidebarOpen, onSidebarToggle, isLoggedIn = false, userName = "John Doe" }: NavbarProps) {
+    const { logout } = useAuth()
+
     return (
         <nav className="fixed top-0 z-40 w-full border-b border-border bg-card">
             <div className="flex h-16 items-center justify-between px-4 lg:px-6">
@@ -60,16 +65,21 @@ export function Navbar({ sidebarOpen, onSidebarToggle, isLoggedIn = false, userN
                                     <span>Profile</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="flex items-center gap-2 px-2 py-1.5 text-destructive">
+                                <DropdownMenuItem
+                                    className="flex items-center gap-2 px-2 py-1.5 text-destructive cursor-pointer"
+                                    onSelect={() => logout()}
+                                >
                                     <LogOut className="h-4 w-4" />
                                     <span>Sign out</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
-                        <Button variant="default" size="sm">
-                            Sign in
-                        </Button>
+                        <Link href="/login">
+                            <Button variant="default" size="sm">
+                                Sign in
+                            </Button>
+                        </Link>
                     )}
                 </div>
             </div>

@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { TaskProvider } from "@/hooks/use-tasks"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -31,6 +32,10 @@ export const metadata: Metadata = {
   },
 }
 
+import { AuthProvider } from "@/hooks/use-auth"
+
+import { Toaster } from "@/components/ui/sonner"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,9 +44,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased`}>
-        <DashboardLayout isLoggedIn={true} userName="Alex Chen">
-          {children}
-        </DashboardLayout>
+        <AuthProvider>
+          <TaskProvider>
+            <DashboardLayout>
+              {children}
+            </DashboardLayout>
+          </TaskProvider>
+        </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>
