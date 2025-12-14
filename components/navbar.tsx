@@ -28,7 +28,7 @@ export function Navbar({ sidebarOpen, onSidebarToggle, isLoggedIn = false, userN
                         variant="ghost"
                         size="icon"
                         onClick={onSidebarToggle}
-                        className="lg:hidden"
+                        className="mr-2"
                         aria-label="Toggle sidebar"
                     >
                         <Menu className="h-5 w-5" />

@@ -44,7 +44,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {/* Sidebar */}
             <aside
                 className={cn(
-                    "fixed left-0 top-16 h-[calc(100vh-64px)] w-64 border-r border-border bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-64px)]",
+                    "fixed left-0 top-16 h-[calc(100vh-64px)] w-64 border-r border-border bg-sidebar text-sidebar-foreground transition-transform duration-300 ease-in-out lg:top-16 lg:h-[calc(100vh-64px)]",
                     isOpen ? "translate-x-0 z-50" : "-translate-x-full",
                 )}
             >
